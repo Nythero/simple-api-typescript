@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import bcrypt from 'bcrypt'
-import User from '../models/User'
+import { create } from '../models/User'
 import ValidationError from '../utils/ValidationError'
 const usersController = Router()
 
@@ -16,7 +16,7 @@ function verifyBody<T extends readonly string[]>(body: unknown, properties: T):
   verifyIsObject(body)
   for(let i = 0; i< properties.length; i++) {
     if (!(properties[i] in body)) {
-      throw new ValidationError(`${properties[i]} is not defined`, properties[i], 'undefined')
+      throw new ValidationError(`${properties[i]} is not defined`, properties[i], 'string')
     }
   }
 }
@@ -37,7 +37,7 @@ usersController.post('/', (req, res, next) => {
     try {
       const passwordHash = await bcrypt.hash(password, saltRounds)
       const newUser = { username, passwordHash }
-      const user = await User.create(newUser)
+      const user = await create(newUser)
       user.username
       res.status(201).json(user)
     }
